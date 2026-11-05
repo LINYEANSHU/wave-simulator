@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  syntax-check:
+    name: Node syntax check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check all JS files with node --check
+        run: |
+          find js -name '*.js' -type f -print0 | xargs -0 -n1 node --check
+          echo "All JS files passed node --check"

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WaveLab · 交互式波动实验室</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Cpath%20d='M3%2016c4-11%207-11%2011%200s7%2011%2011%200'%20fill='none'%20stroke='%23ffb054'%20stroke-width='3'%20stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo">
+    <svg viewBox="0 0 28 28" aria-hidden="true">
+      <path d="M2.5 14c3.5-10 6.5-10 10 0s6.5 10 10 0" fill="none" stroke="#ffb054" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="24.5" cy="9" r="2" fill="#e9e7e2"/>
+    </svg>
+    <div class="logo-text">
+      <span class="logo-name">WaveLab</span>
+      <span class="logo-sub" data-i18n="app.subtitle">交互式波动实验室</span>
+    </div>
+  </div>
+
+  <nav class="scene-tabs" id="sceneTabs" data-i18n-aria="nav.scenes" aria-label="实验场景"></nav>
+
+  <div class="top-actions">
+    <button class="btn ghost lang-btn" id="btnLang" title="Language / 语言"></button>
+    <button class="icon-btn" id="btnShot" data-i18n-title="btn.shot_title" title="导出当前画面为图片"></button>
+    <button class="icon-btn" id="btnPause" data-i18n-title="btn.pause_title" title="暂停 (空格)"></button>
+    <button class="icon-btn" id="btnStep" data-i18n-title="btn.step_title_top" title="单步推进 1/60 模拟秒 (S)"></button>
+    <button class="icon-btn" id="btnResetField" data-i18n-title="btn.reset_title" title="重置波场"></button>
+    <button class="btn ghost" id="btnAbout" data-i18n="btn.about">科学说明</button>
+  </div>
+</header>
+
+<main>
+  <section class="stage" id="stage">
+    <div class="canvas-box" id="canvasBox">
+      <canvas id="glcanvas"></canvas>
+      <div id="screenLabel" data-i18n="screen.label" hidden>观察屏 · 时均强度</div>
+
+      <div class="toolbar" id="toolbar">
+        <button class="tool-btn active" data-tool="source" data-i18n-title="tool.source_title" title="波源：点击放置，拖动移动（快捷键 1）">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><path d="M8.5 15.5a5 5 0 0 1 0-7M15.5 8.5a5 5 0 0 1 0 7M6 18a9 9 0 0 1 0-12M18 6a9 9 0 0 1 0 12"/></svg>
+        </button>
+        <button class="tool-btn" data-tool="pulse" data-i18n-title="tool.pulse_title" title="脉冲：点击激发涟漪（快捷键 2）">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><path d="M12 7.5a4.5 4.5 0 0 1 4.5 4.5M12 16.5A4.5 4.5 0 0 1 7.5 12M12 3.5A8.5 8.5 0 0 1 20.5 12M12 20.5A8.5 8.5 0 0 1 3.5 12"/></svg>
+        </button>
+        <button class="tool-btn" data-tool="wall" data-i18n-title="tool.wall_title" title="墙体：拖动绘制障碍（快捷键 3）">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="1.2"/><path d="M3 12h18M9 6v6M15 6v6M7 12v6M13 12v6"/></svg>
+        </button>
+        <button class="tool-btn" data-tool="erase" data-i18n-title="tool.erase_title" title="擦除：拖动清除障碍（快捷键 4）">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 19.5 4.6 14.6a2 2 0 0 1 0-2.8l7-7a2 2 0 0 1 2.8 0l4.8 4.8a2 2 0 0 1 0 2.8l-6.7 6.7a2 2 0 0 1-2.8 0Z"/><path d="M8 8.5 15.5 16M6.5 19.5H19"/></svg>
+        </button>
+        <button class="tool-btn" data-tool="probe" data-i18n-title="tool.probe_title" title="探针：点击放置，读取该点波形与实测频率（快捷键 5）">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="7.5"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg>
+        </button>
+      </div>
+
+      <div class="chips" id="chips">
+        <span class="chip" id="chipGrid">网格 —</span>
+        <span class="chip" id="chipLambda">λ —</span>
+        <span class="chip" id="chipV">v —</span>
+        <span class="chip" id="chipC">C —</span>
+        <span class="chip" id="chipFps">— FPS</span>
+      </div>
+
+      <div class="hint" id="hint"></div>
+      <div class="brush-cursor" id="brushCursor"></div>
+
+      <div class="scope" id="scopePanel" hidden>
+        <div class="scope-head">
+          <span data-i18n="scope.title">探针读数</span>
+          <button class="mini-btn" id="scopeClose" data-i18n-title="scope.close_title" title="移除探针">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+        <canvas id="scopeCanvas" width="480" height="150"></canvas>
+        <div class="scope-read" id="scopeRead">—</div>
+      </div>
+    </div>
+  </section>
+
+  <aside class="panel">
+    <div class="sec">
+      <div class="sec-title" data-i18n="sec.view">视图</div>
+      <div class="seg" data-group="view">
+        <button data-val="0" class="active" data-i18n="view.wave">波形场</button>
+        <button data-val="1" data-i18n="view.intensity">强度场 · 时均</button>
+      </div>
+      <div class="ctl-row" data-i18n-title="pal.title" title="波形显示的三套配色方案">
+        <span class="lab" data-i18n="pal.lab">配色</span>
+        <div class="seg small" data-group="pal">
+          <button data-val="0" class="active" data-i18n="pal.0">深空</button>
+          <button data-val="1" data-i18n="pal.1">霓虹</button>
+          <button data-val="2" data-i18n="pal.2">冰蓝</button>
+        </div>
+      </div>
+      <div class="ctl-row" data-i18n-title="bound.title" title="外边界:吸收(海绵阻尼,近似无反射)或反射(刚性壁,可观察驻波)">
+        <span class="lab" data-i18n="bound.lab">边界</span>
+        <div class="seg small" data-group="bound">
+          <button data-val="0" class="active" data-i18n="bound.0">吸收</button>
+          <button data-val="1" data-i18n="bound.1">反射</button>
+        </div>
+      </div>
+      <div class="ctl-row" data-i18n-title="meas.title" title="沿屏线读取时均强度 |u|² 剖面,定量观察干涉条纹">
+        <span class="lab" data-i18n="meas.lab">测量</span>
+        <button class="btn toggle" id="btnScreen" aria-pressed="false" data-i18n="screen.off">观察屏 · 关</button>
+      </div>
+      <div class="ctl" data-i18n-title="screen.pos_title" title="观察屏的竖直位置(占画布宽度的百分比)">
+        <span class="lab" data-i18n="screen.pos">屏位置</span>
+        <input type="range" id="screenX" min="0.35" max="0.95" step="0.01" value="0.70" disabled>
+        <span class="val" id="screenXVal">70%</span>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title" data-i18n="sec.sources">波源</div>
+      <div id="srcList" class="src-list"></div>
+      <div class="sub-title" data-i18n="src.defaults">新波源默认参数</div>
+      <div class="ctl" data-i18n-title="src.freq_title" title="新放置波源的频率 f;波长 λ = v/f,频率越高波长越短">
+        <span class="lab" data-i18n="src.freq">频率</span>
+        <input type="range" id="newFreq" min="0.5" max="8" step="0.1" value="5">
+        <span class="val" id="newFreqVal">5.0 Hz</span>
+      </div>
+      <div class="ctl" data-i18n-title="src.amp_title" title="新放置波源的振幅(影响条纹对比度与过载限幅)">
+        <span class="lab" data-i18n="src.amp">振幅</span>
+        <input type="range" id="newAmp" min="0.1" max="1.5" step="0.05" value="0.5">
+        <span class="val" id="newAmpVal">0.50</span>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title" data-i18n="sec.field">场参数</div>
+      <div class="ctl" data-i18n-title="field.speed_title" title="Courant 数 c·Δt/Δx(0.08–0.70),波速 v = C×180 格/秒;超过 0.707 数值不稳定">
+        <span class="lab" data-i18n="field.speed">波速 C</span>
+        <input type="range" id="speed" min="8" max="70" step="1" value="62">
+        <span class="val" id="speedVal">0.62</span>
+      </div>
+      <div class="ctl-row" data-i18n-title="field.playback_title" title="快放/慢放倍率:不改变波形与频率,慢放便于观察衍射细节">
+        <span class="lab" data-i18n="field.playback">时间流速</span>
+        <div class="seg small" data-group="speed">
+          <button data-val="0.25">¼×</button>
+          <button data-val="0.5">½×</button>
+          <button data-val="1" class="active">1×</button>
+          <button data-val="2">2×</button>
+        </div>
+      </div>
+      <div class="ctl" data-i18n-title="field.gain_title" title="显示增益:调高可看清弱条纹,过高会饱和">
+        <span class="lab" data-i18n="field.gain">对比度</span>
+        <input type="range" id="gain" min="0.3" max="4" step="0.05" value="2">
+        <span class="val" id="gainVal">2.00</span>
+      </div>
+      <div class="ctl" data-i18n-title="field.brush_title" title="墙体/擦除笔刷半径(格)">
+        <span class="lab" data-i18n="field.brush">画笔粗细</span>
+        <input type="range" id="brush" min="3" max="20" step="1" value="8">
+        <span class="val" id="brushVal">8 格</span>
+      </div>
+      <div class="ctl-row" data-i18n-title="field.wallmat_title" title="反射墙完全反弹波;吸波墙近似吸收(消声尖劈的一维类比)">
+        <span class="lab" data-i18n="field.wallmat">墙体材质</span>
+        <div class="seg small" data-group="wallmat">
+          <button data-val="0" class="active" data-i18n="wallmat.0">反射墙</button>
+          <button data-val="1" data-i18n="wallmat.1">吸波墙</button>
+        </div>
+      </div>
+      <p class="note" data-i18n="field.note">C = c·Δt/Δx ≤ 1/√2 保证数值稳定；时间流速减慢可细看衍射过程。</p>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title" data-i18n="sec.actions">操作</div>
+      <div class="btn-row">
+        <button class="btn primary" id="btnPause2"></button>
+        <button class="btn" id="btnStep2" data-i18n-title="btn.step2_title" title="暂停并前进 3 个时间步(1/60 模拟秒,快捷键 S)" data-i18n="btn.step">单步</button>
+        <button class="btn" id="btnResetField2" data-i18n="btn.reset">重置波场</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn danger" id="btnClearWalls" data-i18n="btn.clear_walls">清除障碍</button>
+        <button class="btn danger" id="btnClearSrcs" data-i18n="btn.clear_srcs">清除波源</button>
+      </div>
+    </div>
+
+    <p class="foot-note" data-i18n="foot.note">FDTD · WebGL2 · 全部计算在本地 GPU 完成</p>
+  </aside>
+</main>
+
+<!-- 科学说明弹窗 -->
+<div class="modal" id="aboutModal" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 data-i18n="about.title">科学说明</h2>
+      <button class="icon-btn" id="btnCloseAbout" data-i18n-title="btn.close" title="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <h3 data-i18n="about.model.h">物理模型</h3>
+      <p data-i18n-html="about.model.p">本页模拟求解<b>二维标量波动方程</b> ∂²u/∂t² = c²∇²u。u 可以理解为浅水槽表面波的位移，或声波某截面的声压。波源的叠加与干涉、遇到障碍的反射与衍射，都是方程解的自然结果，而非预设动画。</p>
+      <h3 data-i18n="about.fdm.h">数值方法（FDTD）</h3>
+      <p data-i18n="about.fdm.p1">显式二阶中心差分：</p>
+      <p class="eq">uⁿ⁺¹ = 2uⁿ − uⁿ⁻¹ + C²·(uₓ₊ + uₓ₋ + u_y₊ + u_y₋ − 4uⁿ)</p>
+      <p data-i18n-html="about.fdm.p2">其中 C = c·Δt/Δx 为 <b>Courant 数</b>。二维格点上稳定性要求 C ≤ 1/√2 ≈ 0.707，本页限制在 0.08–0.70。空间步长 Δx = 1 格，Δt = 1/180；「时间流速」按倍率推进子步（¼× 慢放便于观察衍射），波形与频率在所有流速下保持一致。</p>
+      <h3 data-i18n="about.src.h">波源</h3>
+      <p data-i18n-html="about.src.p">采用<b>软波源</b>：每步在源区叠加 A·sin(2πft + φ₀) 源项，对外行波近乎透明。点源为高斯窗（σ ≈ 2 格），平面波源为竖直高斯条带。每个波源可独立设定初相位 φ₀：两源反相（相差 180°）即偶极辐射。脉冲工具向场注入一次高斯位移。<b>多普勒场景</b>中的波源以恒定速度往复运动，可观察前方波前压缩、后方疏张。</p>
+      <h3 data-i18n="about.bound.h">障碍与边界条件</h3>
+      <p data-i18n-html="about.bound.p"><b>反射墙</b>内部格点每步强制 u = 0（狄利克雷硬边界），完全反射；<b>吸波墙</b>对墙内格点施加强速度阻尼，近似无反射软材料（消声尖劈的一维类比），可用于建造"安静"的屏障。外边界两种近似：</p>
+      <ul>
+        <li data-i18n-html="about.bound.absorb"><b>吸收</b>：边缘约 11% 区域设置立方渐变的速度阻尼"海绵层"（能量单调耗散）；是完美匹配层（PML）的简化替代，存在微弱残余反射。</li>
+        <li data-i18n-html="about.bound.reflect"><b>反射</b>：最外一圈格点 u = 0，等效刚性壁，可观察驻波与腔内共振。</li>
+      </ul>
+      <h3 data-i18n="about.meas.h">测量工具</h3>
+      <p data-i18n-html="about.meas.p"><b>探针</b>：读取放置点的瞬时 u 并绘制实时波形；「实测频率」由去均值后的过零计数估计，可与设定频率对照：短波长（小 λ）时两者差异正是数值色散的直接体现。<b>观察屏</b>：读取屏线一列的时均强度 |u|²，以剖面形式贴附显示，即经典双缝实验中"屏上光强分布"的数值版本。强度场为 |u|² 的指数滑动平均（时间常数约 1.4 模拟秒）。</p>
+      <h3 data-i18n="about.stab.h">稳定性限制</h3>
+      <p data-i18n-html="about.stab.p">当局部振幅异常增大（如反射腔共振累积）时，施加轻微非线性阻尼"软限幅"防止数值发散；正常幅度 |u| &lt; 0.8 内严格线性。显示端采用 tanh 软压缩色调映射。</p>
+      <h3 data-i18n="about.limits.h">已知近似与局限</h3>
+      <ul>
+        <li data-i18n-html="about.limits.1"><b>数值色散</b>：波长接近格距时相速度略偏慢，建议 λ ≥ 10 格（信息栏实时显示当前波长）。</li>
+        <li data-i18n-html="about.limits.2">二维点源振幅按 ~1/√r 衰减（能量在 1/r 圆周上扩散），与三维的 1/r 不同。</li>
+        <li data-i18n-html="about.limits.3">吸波墙为强阻尼近似，垂直入射吸收良好，掠入射仍有部分反射。</li>
+        <li data-i18n-html="about.limits.4">真实水面重力波是非线性色散系统，此处为线性、非色散近似；定性现象（干涉、衍射、多普勒、拍）一致。</li>
+      </ul>
+      <h3 data-i18n="about.perf.h">性能与隐私</h3>
+      <p data-i18n="about.perf.p">全部计算在浏览器本地完成：WebGL2 fragment shader 上运行 FDTD，约百万格点 × 180 子步/秒（1× 流速），无任何数据上传或外部依赖。</p>
+    </div>
+  </div>
+</div>
+
+<div id="toastWrap"></div>
+
+<div class="fatal" id="fatal" hidden>
+  <div class="fatal-card">
+    <h2 data-i18n="fatal.title">无法启动模拟</h2>
+    <p class="fatal-msg"></p>
+    <p class="fatal-tip" data-i18n="fatal.tip">请使用最新版 Chrome / Edge / Firefox 打开本页面（需要支持 WebGL2 与浮点纹理渲染）。</p>
+  </div>
+</div>
+
+<script src="js/i18n.js"></script>
+<script src="js/glutil.js"></script>
+<script src="js/sim.js"></script>
+<script src="js/scenes.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

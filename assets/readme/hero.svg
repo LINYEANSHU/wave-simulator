@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="380" viewBox="0 0 1200 380" role="img" aria-labelledby="heroTitle heroDesc">
+  <title id="heroTitle">WaveLab — Interactive Wave Laboratory</title>
+  <desc id="heroDesc">WaveLab: a browser-based wave sandbox that solves the two-dimensional wave equation in real time. The panel sketches a double-slit experiment: a point source emits circular wavefronts, a barrier with two slits turns them into secondary sources, and time-averaged interference fringes appear on the observation screen.</desc>
+
+  <defs>
+    <clipPath id="srcZone"><rect x="622" y="46" width="174" height="288" rx="16"/></clipPath>
+    <clipPath id="farZone"><rect x="804" y="46" width="246" height="288" rx="0"/></clipPath>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="1200" height="380" rx="26" fill="#0b0c0e"/>
+
+  <!-- ============ 左侧:标题区 ============ -->
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+    <text x="64" y="92" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="18" letter-spacing="3" fill="#ffb054">WEBGL2 · FDTD · ZERO DEPENDENCIES</text>
+    <text x="60" y="176" font-size="88" font-weight="800" fill="#e9e7e2">WaveLab</text>
+
+    <!-- 波纹符号(取自应用图标) -->
+    <path transform="translate(64 190) scale(2.2)" d="M3 16c4-11 7-11 11 0s7 11 11 0" fill="none" stroke="#ffb054" stroke-width="2.4" stroke-linecap="round"/>
+
+    <text x="64" y="282" font-size="23" fill="#c9cdd4">交互式波动实验室 · Interactive Wave Laboratory</text>
+    <text x="64" y="312" font-size="18" fill="#8b93a1">A real-time 2-D wave equation sandbox.</text>
+    <text x="64" y="338" font-size="18" fill="#8b93a1">No build · no backend · fully local.</text>
+  </g>
+
+  <!-- ============ 右侧:双缝干涉示意 ============ -->
+  <g>
+    <rect x="620" y="44" width="516" height="292" rx="18" fill="#101216" stroke="#26282e"/>
+
+    <!-- 源:入射波前 -->
+    <g clip-path="url(#srcZone)" fill="none" stroke="#ffb054">
+      <circle cx="688" cy="188" r="26"  stroke-opacity="0.85" stroke-width="2"/>
+      <circle cx="688" cy="188" r="52"  stroke-opacity="0.60" stroke-width="1.8"/>
+      <circle cx="688" cy="188" r="78"  stroke-opacity="0.42" stroke-width="1.6"/>
+      <circle cx="688" cy="188" r="104" stroke-opacity="0.28" stroke-width="1.4"/>
+      <circle cx="688" cy="188" r="130" stroke-opacity="0.16" stroke-width="1.2"/>
+    </g>
+    <circle cx="688" cy="188" r="10" fill="#ffb054" fill-opacity="0.16"/>
+    <circle cx="688" cy="188" r="4.5" fill="#ffb054"/>
+
+    <!-- 双缝屏障 -->
+    <g fill="#4a5058">
+      <rect x="796" y="64"  width="8" height="94"/>
+      <rect x="796" y="184" width="8" height="28"/>
+      <rect x="796" y="238" width="8" height="74"/>
+    </g>
+
+    <!-- 缝后:惠更斯子波前(两条缝各自发出) -->
+    <g clip-path="url(#farZone)" fill="none" stroke="#aeb6c2">
+      <circle cx="800" cy="171" r="20"  stroke-opacity="0.62" stroke-width="1.6"/>
+      <circle cx="800" cy="171" r="44"  stroke-opacity="0.44" stroke-width="1.5"/>
+      <circle cx="800" cy="171" r="68"  stroke-opacity="0.32" stroke-width="1.4"/>
+      <circle cx="800" cy="171" r="92"  stroke-opacity="0.22" stroke-width="1.2"/>
+      <circle cx="800" cy="171" r="116" stroke-opacity="0.14" stroke-width="1.2"/>
+      <circle cx="800" cy="171" r="140" stroke-opacity="0.08" stroke-width="1"/>
+      <circle cx="800" cy="225" r="20"  stroke-opacity="0.62" stroke-width="1.6"/>
+      <circle cx="800" cy="225" r="44"  stroke-opacity="0.44" stroke-width="1.5"/>
+      <circle cx="800" cy="225" r="68"  stroke-opacity="0.32" stroke-width="1.4"/>
+      <circle cx="800" cy="225" r="92"  stroke-opacity="0.22" stroke-width="1.2"/>
+      <circle cx="800" cy="225" r="116" stroke-opacity="0.14" stroke-width="1.2"/>
+      <circle cx="800" cy="225" r="140" stroke-opacity="0.08" stroke-width="1"/>
+    </g>
+
+    <!-- 观察屏:虚线 + 时均强度条纹 -->
+    <line x1="1056" y1="64" x2="1056" y2="312" stroke="#565b64" stroke-width="1.5" stroke-dasharray="3 7"/>
+    <g fill="#ffb054">
+      <rect x="1064" y="140"   width="12" height="96" rx="3" fill-opacity="0.95"/>
+      <rect x="1064" y="142"   width="12" height="44" rx="3" fill-opacity="0.70"/>
+      <rect x="1064" y="190"   width="12" height="44" rx="3" fill-opacity="0.70"/>
+      <rect x="1064" y="129"   width="12" height="22" rx="3" fill-opacity="0.50"/>
+      <rect x="1064" y="225"   width="12" height="22" rx="3" fill-opacity="0.50"/>
+      <rect x="1064" y="110"   width="12" height="12" rx="3" fill-opacity="0.38"/>
+      <rect x="1064" y="254"   width="12" height="12" rx="3" fill-opacity="0.38"/>
+      <rect x="1064" y="88.5"  width="12" height="7"  rx="3" fill-opacity="0.28"/>
+      <rect x="1064" y="280.5" width="12" height="7"  rx="3" fill-opacity="0.28"/>
+      <rect x="1064" y="66"    width="12" height="4"  rx="2" fill-opacity="0.20"/>
+      <rect x="1064" y="306"   width="12" height="4"  rx="2" fill-opacity="0.20"/>
+    </g>
+
+    <!-- 部件标签 -->
+    <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" letter-spacing="1.5" fill="#6b7480" text-anchor="middle">
+      <text x="688" y="328">SOURCE</text>
+      <text x="800" y="328">BARRIER</text>
+      <text x="1066" y="328">SCREEN · |u|²</text>
+    </g>
+  </g>
+</svg>

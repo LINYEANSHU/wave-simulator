@@ -1,0 +1,17 @@
+# 本地报告与设计工具产物(不发布)
+OPTIMIZATION-REPORT.md
+.impeccable/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+
+# 依赖与日志(本项目无构建系统,防御性排除)
+node_modules/
+npm-debug.log*
