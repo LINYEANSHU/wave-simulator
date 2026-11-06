@@ -3,16 +3,16 @@
    哑光黑相纸地 · 银盐白墨 · 安全灯琥珀唯一强调 · 平光直角无渐变
    ============================================================ */
 :root {
-  --ground: #0b0d11;        /* 相纸黑:页面与舞台 */
-  --panel: #13161b;         /* 家具面:侧栏/顶栏/浮板 */
-  --panel-2: #1b2027;       /* 抬升面:悬停/输入轨道 */
-  --panel-3: #232a33;       /* 激活填充 */
-  --panel-h: #10141a;       /* 相纸黑与家具面之间的 hover 步 */
+  --ground: #0d1d2b;        /* 深海蓝:让波场保持清晰 */
+  --panel: #142b3a;
+  --panel-2: #1d3a49;
+  --panel-3: #294958;
+  --panel-h: #193240;
   --ink: #e9e7e2;           /* 银盐白 */
-  --dim: #a3a9b1;           /* 次级文本 */
-  --faint: #949ba6;         /* 弱注记 */
-  --accent: #ffb054;        /* 安全灯琥珀:活动态/主行动/选中 */
-  --accent-hi: #ffc678;
+  --dim: #b2c3c9;
+  --faint: #a6bec6;
+  --accent: #e9b66d;
+  --accent-hi: #f2ca92;
   --on-accent: #1d1305;
   --danger: #ff7a6a;
   --sans: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
@@ -213,6 +213,8 @@ main { flex: 1; display: flex; min-height: 0; }
   background: var(--panel);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); /* taste-skill-ignore: 画布上的浮动测量面板,真实 overlay */
   overflow: hidden;
+  /* Explicitly bound the Canvas2D overlay above software-rendered WebGL. */
+  clip-path: inset(0 round 6px);
 }
 .scope-head {
   display: flex;
@@ -576,4 +578,23 @@ input[type="range"]::-moz-range-thumb {
   .scene-tabs { order: 3; flex-basis: 100%; justify-content: flex-start; padding: 2px 0; }
   .scene-tab { padding: 6px 11px; font-size: 12.5px; }
   .top-actions { margin-left: auto; }
+}
+
+::selection { background: #e9b66d; color: #1d1305; }
+input { caret-color: var(--accent); }
+button:disabled { cursor: not-allowed; }
+.modal-body { overscroll-behavior: contain; }
+@media (max-width: 480px) {
+  .topbar { gap: 8px; }
+  .logo { gap: 6px; }
+  .top-actions { gap: 4px; }
+  .top-actions .btn { padding: 7px 8px; }
+  .tool-btn { min-width: 40px; min-height: 40px; }
+  .chips { max-width: calc(100% - 16px); flex-wrap: wrap; }
+  .scope { max-width: calc(100% - 20px); }
+  .modal-card { max-height: 90dvh; }
+  .fatal-card { padding: 24px; margin: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }

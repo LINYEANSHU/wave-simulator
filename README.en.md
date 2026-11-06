@@ -1,104 +1,106 @@
-<div align="center">
+<p align="center"><a href="README.md">简体中文</a> · English</p>
 
-[简体中文](README.md) · **English**
+<p align="center">
+  <img src="./assets/readme/hero.svg" width="100%" alt="WaveLab: a two-dimensional wave equation lab, with a diagram of double slits and an observation screen">
+</p>
 
-<img src="./assets/readme/hero.svg" width="100%" alt="WaveLab — an interactive wave laboratory that solves the 2-D wave equation in real time. The panel sketches a double-slit experiment: a point source emits circular wavefronts, two slits turn them into secondary sources, and time-averaged interference fringes appear on the screen.">
+**Draw sources and barriers, then watch propagation, interference and diffraction.**
+WaveLab advances a two-dimensional scalar wave equation with WebGL2 and measures waveforms and time-averaged intensity with a probe and observation screen.
+
+![Current desktop interface: the initial propagation phase of the double-slit experiment, with wavefronts approaching the slits and controls on the right](assets/readme/current-desktop.png)
+
+<details>
+<summary>View the mobile interface</summary>
+
+<img src="assets/readme/current-mobile.png" width="390" alt="Mobile interface with horizontally selectable scenes, a wave field and probe above the controls">
+
+</details>
 
 [![CI](https://github.com/LINYEANSHU/wave-simulator/actions/workflows/ci.yml/badge.svg)](https://github.com/LINYEANSHU/wave-simulator/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-ffb054.svg)](LICENSE)
+[MIT](LICENSE) · Vanilla JavaScript / WebGL2 · No build · English / 中文
 
-**See the wave equation in action: draw sources, draw obstacles, and let the physics do the rest.**
+## Start with double-slit interference
 
-WaveLab is a real-time two-dimensional wave simulator that runs entirely in your browser. It numerically solves the 2-D wave equation with FDTD (the finite-difference time-domain method), so you can watch propagation, superposition, interference, diffraction, the Doppler effect, and beats as they actually unfold — then measure them with a probe and an observation screen. All computation happens on your local GPU (a WebGL2 fragment shader): no backend, no dependencies, nothing uploaded.
-
-</div>
-
----
-
-## Quick start
-
-Serve the folder with any static file server:
+Open `index.html` directly to load the double-slit scene, or start a local server with Python 3:
 
 ```bash
-# Python
-python -m http.server 8080
-# then open http://localhost:8080 in your browser
-
-# or Node
-npx serve .
+git clone https://github.com/LINYEANSHU/wave-simulator.git
+cd wave-simulator
+python -m http.server 8080 --bind 127.0.0.1
 ```
 
-You can also simply double-click `index.html` — the page uses no ES modules and no external resources, so it runs from `file://` as well.
+Open **http://127.0.0.1:8080**. All scripts and assets are in the repository; no runtime downloads or dependency installation are needed.
 
-**Browser requirements**: an up-to-date Chrome, Edge, or Firefox with WebGL2 and the `EXT_color_buffer_float` extension (the page shows a clear message if either is missing).
+The browser needs **WebGL2** and **`EXT_color_buffer_float`**. Initialization failures appear on the page. Use a modern Chrome, Edge or Firefox configuration that supports both.
 
-## Twelve teaching scenes
+1. Wait for the wavefront to pass through the slits and reach the dashed observation screen.
+2. Select the time-averaged intensity view and watch the fringes develop.
+3. Change the source frequency or erase part of a wall to change the slit width; compare the patterns.
+4. Place a probe to inspect a local waveform. Pause and step through changes, or export a PNG with the camera button.
 
-Each scene is a classic physics demonstration you can measure quantitatively — or take apart and rebuild.
+## Twelve editable scenes
 
-| Scene | What happens | Teaching value · what to watch |
-| --- | --- | --- |
-| Double-Slit Interference | Plane waves pass through two slits; fringes form on the screen | Switch to the intensity view + screen, read the fringe spacing, compare with λL/d |
-| Single-Slit Diffraction | A plane wave spreads after a narrow slit | Watch the central maximum widen as the slit narrows (resize it with the eraser) |
-| Huygens' Principle | Plane waves cross a multi-slit array; every slit re-radiates | Directional beams from a 5-slit grating; positions of the principal maxima |
-| Standing Wave | Two identical plane waves travelling opposite directions | Nodes and antinodes stay put; a probe on a node barely responds |
-| Lloyd's Mirror | Direct and mirror-reflected waves from one point source interfere | Dark fringes hugging the mirror (the reflection phase shift made visible) |
-| Parabolic Focusing | A plane wave reflects off a parabola into its focus | The probe sits at the focus — compare amplitude inside vs. outside |
-| Multi-Source Interference | Five evenly spaced in-phase sources form a beam | Add or remove sources and watch the main lobe sharpen |
-| Doppler Effect | A source moves back and forth | Wavefronts bunch up ahead, stretch out behind; set playback to ¼× |
-| Beat Interference | Two close frequencies add up | Place the probe midway between the sources and read the beat frequency Δf |
-| Dipole Radiation | Two out-of-phase sources | Reinforced along the axis, cancelled on the bisector — flip one phase to 0° and watch the pattern invert |
-| Cavity Standing Wave | Circular waves and their reflections inside rigid walls | Boundary modes (bright corners, strong antinodes) |
-| Sandbox | A blank field with free placement | Build your own experiment with reflective or absorbing walls |
+Presets place sources, barriers and measurement tools. You can continue editing after loading any scene.
 
-## How to use
+| Scene | What to observe |
+| --- | --- |
+| Double-slit interference | Time-averaged screen fringes |
+| Single-slit diffraction | Slit width and lateral spreading |
+| Huygens' principle | Directional beams from multiple slits |
+| Opposing standing waves | Fixed nodes and antinodes |
+| Lloyd's mirror | Direct and reflected wave interference |
+| Parabolic focusing | Amplitude at and away from the focus |
+| Multiple-source interference | Main lobe of equally spaced, in-phase sources |
+| Doppler effect | Wavefront spacing ahead of and behind a moving source |
+| Beats | Envelope formed by nearby frequencies |
+| Dipole radiation | Directionality of opposite-phase sources |
+| Reflective cavity | Standing-wave patterns inside the cavity |
+| Free experiment | Your own sources and reflective or absorbing walls |
 
-- **Toolbar on the left** (keys `1`–`5`): **Source** (click to place, drag to move) · **Pulse** (click to launch a ripple) · **Wall** (drag to draw; switch material in the panel) · **Eraser** (drag to clear; right-click drag works with any tool) · **Probe** (click to drop one; a panel shows the live waveform and measured frequency).
-- **Panel on the right**: source cards (frequency / amplitude / phase / mute / delete); view mode (wave field / time-averaged intensity), three palettes, boundary type, screen toggle and position; wave speed, playback speed, gain, brush size, wall material; pause / step / reset / clear. Every control has a tooltip.
-- **Keyboard**: `Space` pause/resume · `S` single step (pauses first, then advances 1/60 s of simulation time) · `R` reset the field · `1`–`5` switch tools.
-- The readout strip shows the grid size, wavelength λ, wave speed v, Courant number, and frame rate; the camera icon in the header exports a PNG (measurements included).
-- The UI speaks **English and Chinese**: click the 🌐 button in the header, or let the browser language decide on first visit.
+## Tools and measurements
 
-## Physics & numerics in brief
+| Action | Control |
+| --- | --- |
+| Place / move a source | `1`; click to place, drag an existing source |
+| Pulse / wall / eraser / probe | `2` / `3` / `4` / `5` |
+| Temporary erasing | Right-drag with any tool |
+| Pause / step / reset the field | `Space` / `S` / `R` |
+| Frequency, amplitude and phase | Source card |
+| Intensity view, colors, boundary and screen | View controls |
+| Wave speed, playback speed, brush and wall material | Parameter panel |
+| Export / change language | Camera / language button in the top bar |
 
-The in-app "How it works" dialog has the full story; the essentials:
+The probe shows displacement over time and measured frequency. The observation screen samples exponentially averaged intensity `⟨u²⟩` along a vertical line. Allow time for waves to arrive and samples to accumulate; the screen is not an instantaneous far-field analytic solution.
 
-- **Equation and scheme**: the 2-D scalar wave equation ∂²u/∂t² = c²∇²u, advanced with explicit second-order central differences (FDTD). Stability requires C = c·Δt/Δx ≤ 1/√2; the UI keeps C between 0.08 and 0.70. The time step is fixed at Δt = 1/180, decoupled from the display frame rate — a low frame rate only slows playback, it never changes the waveform.
-- **Sources**: soft sources (an additive source term, nearly transparent to outgoing waves); point sources use a Gaussian window, plane waves a vertical Gaussian strip; the initial phase is adjustable, and uniformly moving sources are supported.
-- **Obstacles and boundaries**: reflective walls force u = 0 (perfect reflection); absorbing walls apply strong velocity damping (an approximate reflection-free material); the outer boundary is either a cubic-ramp sponge layer (a crude PML) or a rigid wall.
-- **Screen sampling**: the screen reads one column of time-averaged intensity |u|² (an exponential moving average, τ ≈ 1.4 s of simulation time) and draws the profile beside it — the numerical counterpart of the intensity pattern on a double-slit bench.
-- **Single-step mode**: while paused, `S` advances 3 time steps (1/60 s of simulation time), so you can watch interference and diffraction build up frame by frame with the probe oscilloscope.
-- **Known approximations**: numerical dispersion (keep λ ≥ 10 cells), 2-D point sources decay as ~1/√r, absorbing walls still reflect partially at grazing incidence, and real surface gravity waves are nonlinear — those effects are not modelled.
+## Numerical model
 
-## Project structure
+The solver advances `∂²u/∂t² = c²∇²u` with explicit second-order central differences and a fixed timestep `Δt = 1/180`. The UI constrains the Courant number `C = cΔt/Δx` to 0.08–0.70, below the two-dimensional stability limit `1/√2`.
 
+A fragment shader advances double-buffered floating-point field textures. Reflective walls impose `u = 0`; absorbing walls add damping. The outer boundary can use a sponge layer or reflection. Physics uses fixed steps; at low frame rates, accumulated time is discarded to bound the computation.
+
+Open **Scientific Notes** in the app for the full explanation. Keep roughly 10 or more cells per wavelength to reduce numerical dispersion. Absorbers can still reflect some waves. This is a linear two-dimensional scalar model, without the full fluid dynamics of real water waves.
+
+## Source and checks
+
+| File | Responsibility |
+| --- | --- |
+| [sim.js](js/sim.js) / [glutil.js](js/glutil.js) | FDTD, WebGL2 rendering and measurement readback |
+| [scenes.js](js/scenes.js) | Twelve teaching scenes |
+| [ui.js](js/ui.js) / [i18n.js](js/i18n.js) | Tools, measurement panels and bilingual text |
+| [main.js](js/main.js) | Fixed-timestep loop and canvas sizing |
+
+CI uses Node.js 22 to syntax-check all JavaScript. In PowerShell:
+
+```powershell
+Get-ChildItem js -Recurse -Filter *.js | ForEach-Object { node --check $_.FullName; if ($LASTEXITCODE) { throw $_.FullName } }
 ```
-wave-simulator/
-├── index.html        page skeleton, controls, "how it works" dialog
-├── css/style.css     the "darkroom" visual system (matte black / silver / safelight amber)
-└── js/
-    ├── i18n.js       English–Chinese dictionary and language switching
-    ├── glutil.js     WebGL helpers (shader cache, program wrapper, fullscreen triangle)
-    ├── sim.js        simulation core: stepping/render shaders, WaveSim class, measurement readback
-    ├── scenes.js     definitions of the twelve teaching scenes
-    ├── ui.js         tool state machine, pointer interaction, cards, HUD
-    └── main.js       boot, fixed-timestep main loop (rAF + starvation watchdog), resizing
-```
 
-## Implementation notes
+Syntax checks do not cover shader compilation, numerical accuracy or device performance. Recheck wave propagation and measurements in the browser after changing the numerical model.
 
-- **Rendering**: the canvas back buffer *is* the simulation grid, displayed with CSS smoothing — this sidesteps float-texture linear-filtering compatibility issues.
-- **Data layout**: one RGBA float texture double-buffered as `(u, u_prev, time-avg intensity)`; the obstacle mask is RGBA8 (R = reflective, G = absorbing), uploaded on change.
-- **Measurement readback**: 1×1 (probe) and 1×H (screen) `readPixels` calls every frame or every other frame — negligible overhead.
-- **Main loop**: requestAnimationFrame with a starvation watchdog (if the environment suspends rAF while the page is visible, a 16 ms timer takes over); `?autodrive` is a hook for automated testing.
-- **Performance**: 140+ FPS on desktop (1× playback, 144 Hz display).
+## Contributors
 
-## References & acknowledgements
-
-- The twelve scenes draw their inspiration from **undergraduate wave-optics demonstrations** — double-slit interference, single-slit diffraction, Huygens' principle, Lloyd's mirror, and standing waves are all classic lecture demonstrations. This project turns their water-tank cousins into a hands-on sandbox.
-- The numerics follow the **finite-difference time-domain (FDTD)** idea introduced by Kane Yee in 1966 (the same grid-based difference scheme used for Maxwell's equations, here applied to the scalar wave equation).
-- The stack is **vanilla WebGL2 + vanilla JavaScript**: no runtime dependencies, no build system, and a hand-written English–Chinese dictionary for the UI.
+- [LINYEANSHU](https://github.com/LINYEANSHU)
 
 ## License
 
-[MIT](LICENSE) © 2026 LINYEANSHU — free to use, modify, and distribute.
+[MIT](LICENSE) © 2026 LINYEANSHU. The project uses native browser APIs with no third-party runtime libraries. Scenes are based on classic wave-optics teaching experiments.

@@ -184,10 +184,10 @@
 </main>
 
 <!-- 科学说明弹窗 -->
-<div class="modal" id="aboutModal" hidden>
+<div class="modal" id="aboutModal" role="dialog" aria-modal="true" aria-labelledby="aboutTitle" hidden>
   <div class="modal-card">
     <div class="modal-head">
-      <h2 data-i18n="about.title">科学说明</h2>
+      <h2 id="aboutTitle" data-i18n="about.title">科学说明</h2>
       <button class="icon-btn" id="btnCloseAbout" data-i18n-title="btn.close" title="关闭">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
       </button>

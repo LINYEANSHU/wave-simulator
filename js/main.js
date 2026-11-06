@@ -77,8 +77,10 @@
       return;
     }
 
+    let contextLost=false;
     canvas.addEventListener('webglcontextlost', (e) => {
       e.preventDefault();
+      contextLost=true;
       fatal(t('fatal.ctxlost'));
     });
 
@@ -99,6 +101,7 @@
     let rafPending = false;
 
     function tick(now) {
+      if (document.hidden || contextLost) { last=now; acc=0; return; }
       const dt = Math.min((now - last) / 1000, 0.1);
       last = now;
 

@@ -701,7 +701,8 @@
 
     // 键盘
     window.addEventListener('keydown', (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey || e.repeat ||
+          !$('#aboutModal').hidden || e.target.closest('input, textarea, select, button, [contenteditable="true"]')) return;
       if (e.code === 'Space') {
         e.preventDefault();
         setPaused(!state.paused);
@@ -716,10 +717,22 @@
 
     // 科学说明弹窗
     const modal = $('#aboutModal');
-    $('#btnAbout').addEventListener('click', () => { modal.hidden = false; });
-    $('#btnCloseAbout').addEventListener('click', () => { modal.hidden = true; });
-    modal.addEventListener('click', (ev) => { if (ev.target === modal) modal.hidden = true; });
-    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') modal.hidden = true; });
+    let previousFocus=null;
+    const closeAbout=()=>{ modal.hidden=true; previousFocus?.focus(); };
+    $('#btnAbout').addEventListener('click', () => {
+      previousFocus=document.activeElement; modal.hidden=false; $('#btnCloseAbout').focus();
+    });
+    $('#btnCloseAbout').addEventListener('click', closeAbout);
+    modal.addEventListener('click', (ev) => { if (ev.target === modal) closeAbout(); });
+    modal.addEventListener('keydown', (e) => {
+      if (e.key==='Escape') { e.preventDefault(); closeAbout(); }
+      if (e.key==='Tab') {
+        const focusable=[...modal.querySelectorAll('button, a[href], input, select, textarea, [tabindex="0"]')];
+        const first=focusable[0], last=focusable[focusable.length-1];
+        if (e.shiftKey&&document.activeElement===first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey&&document.activeElement===last) { e.preventDefault(); first.focus(); }
+      }
+    });
 
     refreshCards();
     syncScreenControls();
