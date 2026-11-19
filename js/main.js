@@ -77,11 +77,23 @@
       return;
     }
 
-    let contextLost=false;
+    let contextLost = false;
     canvas.addEventListener('webglcontextlost', (e) => {
       e.preventDefault();
-      contextLost=true;
+      contextLost = true;
       fatal(t('fatal.ctxlost'));
+    });
+    canvas.addEventListener('webglcontextrestored', () => {
+      try {
+        WL.sim = new WL.WaveSim(canvas);
+        contextLost = false;
+        const f = document.getElementById('fatal');
+        if (f) f.hidden = true;
+        fit(true);
+        WL.ui.loadScene(WL.ui.state.scene || 'slit2', true);
+      } catch (err) {
+        fatal(t('fatal.init', { msg: err.message }));
+      }
     });
 
     WL.ui.init();

@@ -109,7 +109,7 @@
         const vx = Math.round(W * 0.62);          // 抛物面顶点(最右点)
         const f = Math.max(40, Math.round(W * 0.14)); // 焦距(格),焦点在 vx - f
         const dyMax = Math.min(cy - 6, Math.floor(Math.sqrt(4 * f * Math.max(8, vx - 8))));
-        let px = vx, py = cy - dyMax;
+        let px = vx - (dyMax * dyMax) / (4 * f), py = cy - dyMax;
         for (let y = cy - dyMax + 6; y <= cy + dyMax; y += 6) {
           const x = vx - (y - cy) * (y - cy) / (4 * f);
           api.wallStroke(px, py, x, y, 5);

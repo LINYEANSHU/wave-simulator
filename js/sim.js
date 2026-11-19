@@ -31,9 +31,8 @@
   out vec4 outColor;
 
   void main() {
-    vec2 st = vec2(vUV.x, 1.0 - vUV.y);
     ivec2 N = ivec2(uGrid);
-    ivec2 ij = ivec2(floor(st * uGrid));
+    ivec2 ij = ivec2(gl_FragCoord.xy);
     ivec2 c0 = clamp(ij, ivec2(0), N - ivec2(1));
     vec4 f0 = texelFetch(uField, c0, 0);
     float uc = f0.r, up = f0.g, I = f0.b;
@@ -243,9 +242,8 @@
   in vec2 vUV;
   out vec4 outColor;
   void main() {
-    vec2 st = vec2(vUV.x, 1.0 - vUV.y);
     ivec2 N = ivec2(uGrid);
-    ivec2 ij = ivec2(floor(st * uGrid));
+    ivec2 ij = ivec2(gl_FragCoord.xy);
     ivec2 c0 = clamp(ij, ivec2(0), N - ivec2(1));
     vec4 f = texelFetch(uField, c0, 0);
     vec2 p = vec2(c0) + 0.5;
@@ -278,9 +276,8 @@
   in vec2 vUV;
   out vec4 outColor;
   void main() {
-    vec2 st = vec2(vUV.x, 1.0 - vUV.y);
     ivec2 N = ivec2(uSrcSize);
-    ivec2 c0 = clamp(ivec2(floor(st * uSrcSize)), ivec2(0), N - ivec2(1));
+    ivec2 c0 = clamp(ivec2(floor(vUV * uSrcSize)), ivec2(0), N - ivec2(1));
     vec4 v = texelFetch(uTex, c0, 0);
     if (uMode == 1) {
       // 阈值化搬运需分别保留 R(反射墙)与 G(吸波墙)两个通道,
@@ -435,12 +432,17 @@
       }
 
       // 障碍画布(CPU 侧绘制,上传为纹理)。
-      // 旧掩码随后由阈值化 blit 逐格全量覆盖,故无需再在 CPU 侧缩放旧画布。
+      // 同步将旧障碍画布以最近邻缩放到新画布,保证后续画笔 flushMask() 不会清空已有墙体。
+      const oldMaskCanvas = this.maskCanvas;
       const mc = document.createElement('canvas');
       mc.width = w; mc.height = h;
       const ctx = mc.getContext('2d');
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, w, h);
+      if (!first && oldMaskCanvas && oldW > 0 && oldH > 0) {
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(oldMaskCanvas, 0, 0, w, h);
+      }
       this.maskCanvas = mc;
       this.maskCtx = ctx;
 
