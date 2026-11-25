@@ -63,10 +63,13 @@
   let probeHead = 0, probeCount = 0;
   const probePixel = new Float32Array(4);
   let probePeak = 0.3;
+  let scopeDirty = true;
 
   /* 观察屏回读缓冲 */
   let screenBuf = null;
   let screenPeak = 0.2;
+  let screenRevision = -1;
+  let sampledColumn = -1;
   let frameNo = 0;
 
   /* ---------------- 基础组件 ---------------- */
@@ -208,26 +211,39 @@
   /* ---------------- 探针与示波器 ---------------- */
 
   function setProbe(nx, ny) {
-    sim.probe = { nx, ny };
+    sim.probe = {
+      nx: Math.min(1, Math.max(0, nx)),
+      ny: Math.min(1, Math.max(0, ny)),
+    };
     el.scopePanel.hidden = false;
-    syncOverlaySize();
+    resetMeasurements();
   }
 
   function clearProbe() {
     sim.probe = null;
-    probeCount = 0; probeHead = 0; probePeak = 0.3;
     el.scopePanel.hidden = true;
+    resetMeasurements();
+  }
+
+  function resetMeasurements() {
+    probeCount = 0; probeHead = 0; probePeak = 0.3;
+    el.scopeRead.textContent = '—';
+    scopeDirty = true;
+    screenPeak = 0.2;
+    screenRevision = -1;
   }
 
   function sampleProbe(force) {
     if (!sim.probe) return;
     if (state.paused && !force) return; // 单步推进时以 force 采样,保持示波器连续
+    if (!force && probeCount && probeTime[(probeHead - 1 + PROBE_N) % PROBE_N] === sim.t) return;
     sim.readProbe(probePixel);
     const u = probePixel[0];
     probeBuf[probeHead] = u;
     probeTime[probeHead] = sim.t;
     probeHead = (probeHead + 1) % PROBE_N;
     if (probeCount < PROBE_N) probeCount++;
+    scopeDirty = true;
   }
 
   function drawScope() {
@@ -307,21 +323,27 @@
     ovlCapH = h;
   }
 
-  function updateScreenOverlay() {
+  function updateScreenOverlay(forceGeometry = false) {
     const on = sim.screen.on;
     el.screenLabel.hidden = !on;
     if (!on) { sim.setOverlayGeometry(null); return; }
+    const needsReading = screenRevision !== sim.fieldRevision || sampledColumn !== sim.screen.nx;
+    if (!needsReading && !forceGeometry) return;
     const cssW = el.canvas.clientWidth || sim.w;
     const sx = sim.screen.nx * cssW;
     const dir = sx > cssW - 150 ? -1 : 1;
     const room = dir === 1 ? Math.min(120, cssW - sx - 12) : Math.min(120, sx - 12);
 
     ensureScreenBuf();
-    sim.readScreenProfile(screenBuf);
     const h = sim.h;
-    let mx = 0.02;
-    for (let i = 0; i < h; i++) mx = Math.max(mx, screenBuf[h + i]);
-    screenPeak += (mx - screenPeak) * 0.04;
+    if (needsReading) {
+      sim.readScreenProfile(screenBuf);
+      screenRevision = sim.fieldRevision;
+      sampledColumn = sim.screen.nx;
+      let mx = 0.02;
+      for (let i = 0; i < h; i++) mx = Math.max(mx, screenBuf[h + i]);
+      screenPeak += (mx - screenPeak) * 0.04;
+    }
 
     ensureOverlayBufs(h);
 
@@ -363,7 +385,7 @@
   }
 
   function syncOverlaySize() {
-    updateScreenOverlay(); // 画布尺寸/位置变化后立即同步几何与标签
+    updateScreenOverlay(true); // 画布尺寸/位置变化后立即同步几何与标签
   }
 
   /* ---------------- 截图 ---------------- */
@@ -374,11 +396,11 @@
     // 像素必然完整,之后的异步 toBlob 也只读取 2D 副本,与 GL 画布无关。
     WL.sim.render(performance.now() / 1000);
     const c = el.canvas;
-    const t = document.createElement('canvas');
-    t.width = c.width; t.height = c.height;
-    const tc = t.getContext('2d');
+    const copy = document.createElement('canvas');
+    copy.width = c.width; copy.height = c.height;
+    const tc = copy.getContext('2d');
     tc.drawImage(c, 0, 0);
-    t.toBlob((b) => {
+    copy.toBlob((b) => {
       if (!b) { toast(t('toast.shot_fail')); return; }
       const a = document.createElement('a');
       a.href = URL.createObjectURL(b);
@@ -417,7 +439,7 @@
     else { sim.screen.on = false; }
     syncScreenControls();
     handles.screenX.sync(sim.screen.nx);
-    if (sc.probe) { setProbe(sc.probe.nx, sc.probe.ny); probeCount = 0; probeHead = 0; }
+    if (sc.probe) setProbe(sc.probe.nx, sc.probe.ny);
     else clearProbe();
 
     const api = {
@@ -433,11 +455,84 @@
     select(-1);
     syncSeg('view', sim.view);
     syncSeg('bound', sim.bound);
-    $$('#sceneTabs .scene-tab').forEach((b) => b.classList.toggle('active', b.dataset.scene === id));
+    syncSceneTabs();
     refreshCards();
+    syncOverlaySize();
     if (!quiet) {
       const name = i18n.sceneName(sc);
       toast(t('toast.scene_loaded', { name }) + (sc.desc ? ' — ' + i18n.sceneDesc(sc) : ''));
+    }
+  }
+
+  function saveExperiment() {
+    const { scene, tool, paused, speed, brush, newFreq, newAmp, wallMat } = state;
+    const { C, gain, view, pal, bound, screen, probe } = sim;
+    const sources = sim.sources.map(({ nx, ny, freq, amp, type, phase0, on, motion }) =>
+      ({ nx, ny, freq, amp, type, phase0, on, motion }));
+    try {
+      const mask = sim.maskCanvas.toDataURL('image/png');
+      const setup = { scene, tool, paused, speed, brush, newFreq, newAmp, wallMat,
+        C, gain, view, pal, bound, screen, probe, sources, mask };
+      localStorage.setItem(WL.experiment.key, WL.experiment.encode(setup));
+      toast(t('experiment.saved'));
+    } catch {
+      toast(t('experiment.saveFailed'));
+    }
+  }
+
+  async function restoreExperiment() {
+    el.restoreExperiment.disabled = el.saveExperiment.disabled = true;
+    try {
+      const text = localStorage.getItem(WL.experiment.key);
+      if (text === null) { toast(t('experiment.empty')); return; }
+      const setup = WL.experiment.decode(text);
+      if (!Object.hasOwn(WL.SCENES, setup.scene)) throw new Error('Unknown scene');
+      const image = new Image();
+      image.src = setup.mask;
+      await image.decode();
+      if (image.naturalWidth < 320 || image.naturalWidth > 1280 || image.naturalHeight !== 540) {
+        throw new Error('Invalid mask dimensions');
+      }
+      sim.restoreWallMask(image);
+      sim.sources.length = 0;
+      for (const source of setup.sources) {
+        addSource({ x: source.nx * sim.w, y: source.ny * sim.h }, source).on = source.on;
+      }
+      sim.resetField();
+      sim.C = setup.C;
+      sim.gain = setup.gain;
+      sim.view = setup.view;
+      sim.pal = setup.pal;
+      sim.bound = setup.bound;
+      sim.wallMaterial = setup.wallMat;
+      sim.screen = setup.screen;
+      drag = null;
+      const { scene, speed, brush, newFreq, newAmp, wallMat } = setup;
+      Object.assign(state, { scene, speed, brush, newFreq, newAmp, wallMat });
+      handles.speed.sync(setup.C * 100);
+      handles.gain.sync(setup.gain);
+      handles.brush.sync(brush);
+      handles.newFreq.sync(newFreq);
+      handles.newAmp.sync(newAmp);
+      handles.screenX.sync(setup.screen.nx);
+      for (const group of ['view', 'pal', 'bound', 'speed', 'wallmat']) {
+        syncSeg(group, group === 'wallmat' ? wallMat : setup[group]);
+      }
+      setTool(setup.tool);
+      setPaused(setup.paused);
+      select(-1);
+      refreshCards();
+      syncSceneTabs();
+      syncScreenControls();
+      if (setup.probe) setProbe(setup.probe.nx, setup.probe.ny);
+      else clearProbe();
+      syncOverlaySize();
+      hud(1);
+      toast(t('experiment.restored'));
+    } catch {
+      toast(t('experiment.restoreFailed'));
+    } finally {
+      el.restoreExperiment.disabled = el.saveExperiment.disabled = false;
     }
   }
 
@@ -467,7 +562,6 @@
     } else if (state.tool === 'probe') {
       drag = { mode: 'probe' };
       setProbe(g.x / sim.w, g.y / sim.h);
-      probeCount = 0; probeHead = 0;
     } else {
       const i = pickSource(g);
       if (i >= 0) {
@@ -588,7 +682,7 @@
   function perFrame() {
     frameNo++;
     sampleProbe();
-    drawScope();
+    if (scopeDirty) { drawScope(); scopeDirty = false; }
     if (frameNo % 2 === 0) updateScreenOverlay();
   }
 
@@ -616,6 +710,10 @@
     el.scopeRead = $('#scopeRead');
     el.btnScreen = $('#btnScreen');
     el.screenX = $('#screenX');
+    el.saveExperiment = $('#saveExperiment');
+    el.restoreExperiment = $('#restoreExperiment');
+    el.saveExperiment.addEventListener('click', saveExperiment);
+    el.restoreExperiment.addEventListener('click', restoreExperiment);
 
     // 场景标签
     buildSceneTabs();
@@ -689,12 +787,14 @@
     });
 
     $('#btnPause2').addEventListener('click', () => setPaused(!state.paused));
-    $('#btnResetField2').addEventListener('click', () => { sim.resetField(); toast(t('toast.field_reset')); });
-    $('#btnResetField').addEventListener('click', () => { sim.resetField(); toast(t('toast.field_reset')); });
+    const reset = () => { sim.resetField(); resetMeasurements(); toast(t('toast.field_reset')); };
+    $('#btnResetField2').addEventListener('click', reset);
+    $('#btnResetField').addEventListener('click', reset);
     $('#btnClearWalls').addEventListener('click', () => { sim.clearWalls(); toast(t('toast.walls_cleared')); });
     $('#btnClearSrcs').addEventListener('click', () => {
       sim.sources.length = 0;
       select(-1);
+      refreshCards();
       toast(t('toast.srcs_cleared'));
     });
     $('#scopeClose').addEventListener('click', clearProbe);
@@ -709,7 +809,7 @@
       } else if (e.key >= '1' && e.key <= '5') {
         setTool(['source', 'pulse', 'wall', 'erase', 'probe'][+e.key - 1]);
       } else if (e.key === 'r' || e.key === 'R') {
-        sim.resetField();
+        reset();
       } else if (e.key === 's' || e.key === 'S') {
         stepOnce();
       }
@@ -753,6 +853,10 @@
       b.addEventListener('click', () => loadScene(id));
       nav.appendChild(b);
     });
+    syncSceneTabs();
+  }
+
+  function syncSceneTabs() {
     $$('#sceneTabs .scene-tab').forEach((b) => b.classList.toggle('active', b.dataset.scene === state.scene));
   }
 
@@ -763,6 +867,7 @@
     setPaused(state.paused);   // 更新暂停/继续按钮
     syncScreenControls();      // 更新观察屏开关
     refreshCards();            // 重建波源卡片
+    scopeDirty = true;
     hud(1);                    // 强制刷新 HUD 读数
   }
 
@@ -770,6 +875,7 @@
     init, loadScene, setTool, setPaused, hud, toast, refreshCards,
     perFrame, updateScreenOverlay, syncOverlaySize, takeScreenshot, state, sampleProbe,
     onLanguageChange,
+    replaceSimulation(next) { sim = next; },
     get ready() { return !!sim; },
   };
 })();

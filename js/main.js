@@ -86,6 +86,7 @@
     canvas.addEventListener('webglcontextrestored', () => {
       try {
         WL.sim = new WL.WaveSim(canvas);
+        WL.ui.replaceSimulation(WL.sim);
         contextLost = false;
         const f = document.getElementById('fatal');
         if (f) f.hidden = true;

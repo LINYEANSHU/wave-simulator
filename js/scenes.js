@@ -192,6 +192,28 @@
       },
     },
 
+    waveguide: {
+      name: '弯折波导',
+      desc: '用探针测量弯道后的信号。试着封住弯道，再比较开放和封闭时的读数。',
+      nameEn: 'Bent Waveguide',
+      descEn: 'Measure the signal after the bend. Seal the bend with the wall brush and compare the probe readings.',
+      view: 1, bound: 0,
+      probe: { nx: 0.81, ny: 0.71 },
+      build(api) {
+        const { W, H } = api;
+        api.addSource({ nx: 0.14, ny: 0.29, freq: 4, amp: 0.4 });
+        const wall = (x, y, w, h) => api.wallRect(
+          Math.round(x * W), Math.round(y * H), Math.ceil(w * W), Math.ceil(h * H),
+        );
+        wall(0, 0.2, 0.64, 0.02);
+        wall(0.62, 0.2, 0.02, 0.44);
+        wall(0.62, 0.62, 0.38, 0.02);
+        wall(0, 0.37, 0.45, 0.02);
+        wall(0.43, 0.37, 0.02, 0.44);
+        wall(0.43, 0.79, 0.57, 0.02);
+      },
+    },
+
     free: {
       name: '自由实验',
       desc: '空白场地,自由放置波源与障碍(墙体可切换吸波材质)',

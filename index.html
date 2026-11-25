@@ -179,6 +179,14 @@
       </div>
     </div>
 
+    <section class="sec">
+      <div class="sec-title" data-i18n="experiment.title">实验存档</div>
+      <div class="btn-row">
+        <button class="btn" id="saveExperiment" data-i18n="experiment.save">保存实验</button>
+        <button class="btn" id="restoreExperiment" data-i18n="experiment.restore">恢复实验</button>
+      </div>
+      <p class="note" data-i18n="experiment.help">恢复时保留波源、障碍和测量位置，波场从零开始。</p>
+    </section>
     <p class="foot-note" data-i18n="foot.note">FDTD · WebGL2 · 全部计算在本地 GPU 完成</p>
   </aside>
 </main>
@@ -238,6 +246,7 @@
 <script src="js/glutil.js"></script>
 <script src="js/sim.js"></script>
 <script src="js/scenes.js"></script>
+<script src="js/experiment.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/main.js"></script>
 </body>

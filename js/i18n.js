@@ -95,6 +95,15 @@
 
       'sec.actions': '操作',
       'foot.note': 'FDTD · WebGL2 · 全部计算在本地 GPU 完成',
+      'experiment.title': '实验存档',
+      'experiment.save': '保存实验',
+      'experiment.restore': '恢复实验',
+      'experiment.help': '恢复时保留波源、障碍和测量位置，波场从零开始。',
+      'experiment.saved': '已保存实验设置。',
+      'experiment.restored': '已恢复实验设置，波场从零开始。',
+      'experiment.empty': '还没有本地实验存档。',
+      'experiment.saveFailed': '无法写入本地实验存档。',
+      'experiment.restoreFailed': '无法读取这个实验存档。',
 
       'hint.source': '点击空白处放置波源 · 拖动已有波源调整位置',
       'hint.pulse': '点击或拖动,激发涟漪脉冲',
@@ -234,6 +243,15 @@
 
       'sec.actions': 'Actions',
       'foot.note': 'FDTD · WebGL2 · all computation runs on your local GPU',
+      'experiment.title': 'Experiment Save',
+      'experiment.save': 'Save Experiment',
+      'experiment.restore': 'Restore Experiment',
+      'experiment.help': 'Restoring keeps sources, walls, and measurement positions and starts with a flat wave field.',
+      'experiment.saved': 'Experiment setup saved.',
+      'experiment.restored': 'Experiment setup restored with a flat wave field.',
+      'experiment.empty': 'There is no local experiment save yet.',
+      'experiment.saveFailed': 'Could not write the local experiment save.',
+      'experiment.restoreFailed': 'Could not read this experiment save.',
 
       'hint.source': 'Click empty space to place a source · drag an existing one to move it',
       'hint.pulse': 'Click or drag to launch ripple pulses',

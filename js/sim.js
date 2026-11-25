@@ -314,6 +314,7 @@
       this.pal = 0;
       this.gain = 2.0;
       this.t = 0;               // 模拟时间
+      this.fieldRevision = 0;
       this.w = 0; this.h = 0;
       this.maskDirty = false;
       this.wallMaterial = 0;    // 0 反射墙 / 1 吸波墙
@@ -473,6 +474,7 @@
 
       this._spongeW = Math.max(14, Math.min(w, h) * 0.11);
       this.w = w; this.h = h;
+      this.fieldRevision++;
       this.maskDirty = false;
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       while (gl.getError() !== gl.NO_ERROR) {} // 清理尺寸迁移期间的残留错误码
@@ -519,12 +521,23 @@
       this.maskCtx.fillRect(0, 0, this.w, this.h);
       this._markMask();
     }
+    restoreWallMask(image) {
+      const canvas = document.createElement('canvas');
+      canvas.width = this.w;
+      canvas.height = this.h;
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(image, 0, 0, this.w, this.h);
+      this.maskCanvas = canvas;
+      this.maskCtx = ctx;
+      this._markMask();
+    }
     flushMask() {
       if (!this.maskDirty) return;
       const gl = this.gl;
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, this.maskTex);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, this.maskCanvas);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.maskCanvas);
       this.maskDirty = false;
     }
 
@@ -585,6 +598,7 @@
       let f = this.fboA; this.fboA = this.fboB; this.fboB = f;
 
       this.t += dt;
+      this.fieldRevision++;
       const dph = TAU * dt;
       // 热路径:索引循环替代 for...of(避免每子步创建数组迭代器)
       const srcs = this.sources;
@@ -606,6 +620,7 @@
 
     /** 注入一次高斯脉冲(石子落水) */
     impulse(cx, cy, amp, sigma) {
+      this.flushMask();
       const gl = this.gl;
       gl.bindVertexArray(this._quadVao);
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.fboB);
@@ -619,6 +634,7 @@
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       let t = this.texA; this.texA = this.texB; this.texB = t;
       let f = this.fboA; this.fboA = this.fboB; this.fboB = f;
+      this.fieldRevision++;
     }
 
     resetField() {
@@ -628,11 +644,13 @@
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.fboB); gl.clear(gl.COLOR_BUFFER_BIT);
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       this.t = 0;
+      this.fieldRevision++;
       for (const s of this.sources) s.phase = 0;
     }
 
     /** 渲染到画布(画布后备存储即网格尺寸,CSS 负责平滑缩放) */
     render(realTime) {
+      this.flushMask();
       const gl = this.gl;
       gl.bindVertexArray(this._quadVao);
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);

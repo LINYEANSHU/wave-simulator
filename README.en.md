@@ -44,7 +44,7 @@ The browser needs **WebGL2** and **`EXT_color_buffer_float`**. Initialization fa
 3. Change the source frequency or erase part of a wall to change the slit width; compare the patterns.
 4. Place a probe to inspect a local waveform. Pause and step through changes, or export a PNG with the camera button.
 
-## Twelve editable scenes
+## Thirteen editable scenes
 
 Presets place sources, barriers and measurement tools. You can continue editing after loading any scene.
 
@@ -61,6 +61,7 @@ Presets place sources, barriers and measurement tools. You can continue editing 
 | Beats | Envelope formed by nearby frequencies |
 | Dipole radiation | Directionality of opposite-phase sources |
 | Reflective cavity | Standing-wave patterns inside the cavity |
+| Bent waveguide | Compare downstream probe readings with the bend open and sealed |
 | Free experiment | Your own sources and reflective or absorbing walls |
 
 ## Tools and measurements
@@ -75,6 +76,7 @@ Presets place sources, barriers and measurement tools. You can continue editing 
 | Intensity view, colors, boundary and screen | View controls |
 | Wave speed, playback speed, brush and wall material | Parameter panel |
 | Export / change language | Camera / language button in the top bar |
+| Save / restore experiment | Save local sources, walls, probe, screen and settings. Restore starts with a flat field |
 
 The probe shows displacement over time and measured frequency. The observation screen samples exponentially averaged intensity `⟨u²⟩` along a vertical line. Allow time for waves to arrive and samples to accumulate; the screen is not an instantaneous far-field analytic solution.
 
@@ -91,7 +93,7 @@ Open **Scientific Notes** in the app for the full explanation. Keep roughly 10 o
 | File | Responsibility |
 | --- | --- |
 | [sim.js](js/sim.js) / [glutil.js](js/glutil.js) | FDTD, WebGL2 rendering and measurement readback |
-| [scenes.js](js/scenes.js) | Twelve teaching scenes |
+| [scenes.js](js/scenes.js) | Thirteen teaching scenes |
 | [ui.js](js/ui.js) / [i18n.js](js/i18n.js) | Tools, measurement panels and bilingual text |
 | [main.js](js/main.js) | Fixed-timestep loop and canvas sizing |
 
