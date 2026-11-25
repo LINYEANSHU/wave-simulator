@@ -1,0 +1,12 @@
+{
+  "id": "wave-simulator",
+  "name": "WaveLab 波动模拟器",
+  "exe": "WaveLab",
+  "static": [
+    "index.html",
+    "css",
+    "js"
+  ],
+  "background": "#0a111d",
+  "webgl": true
+}

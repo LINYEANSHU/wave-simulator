@@ -7,21 +7,27 @@
 **画波源、画障碍，在浏览器里观察传播、干涉与衍射。**
 WaveLab 用 WebGL2 实时推进二维标量波动方程，并用探针和观察屏测量波形与时均强度。
 
-![当前桌面界面：双缝实验的初始传播阶段，左侧波前正在向缝隙推进，右侧为波源和场参数](assets/readme/current-desktop.png)
+**[下载 Windows 版（x64）](https://github.com/LINYEANSHU/wave-simulator/releases/download/windows-v1.0.0/wave-simulator-windows-x64.zip)** · [发行说明](https://github.com/LINYEANSHU/wave-simulator/releases/tag/windows-v1.0.0)
+
+解压 ZIP 后，双击应用文件夹中的 `WaveLab.exe`。如需移动应用，请保留整个文件夹。
+
+![Windows 桌面版的双缝实验，显示波源、缝隙、观察屏和探针](assets/readme/windows-desktop.webp)
 
 <details>
-<summary>查看移动端界面</summary>
+<summary>查看浏览器桌面和移动端界面</summary>
+
+<img src="assets/readme/current-desktop.png" alt="当前桌面界面：双缝实验的初始传播阶段，左侧波前正在向缝隙推进，右侧为波源和场参数">
 
 <img src="assets/readme/current-mobile.png" width="390" alt="移动端界面：可横向选择实验，波场和探针位于参数面板上方">
 
 </details>
 
 [![CI](https://github.com/LINYEANSHU/wave-simulator/actions/workflows/ci.yml/badge.svg)](https://github.com/LINYEANSHU/wave-simulator/actions/workflows/ci.yml)
-[MIT](LICENSE) · 原生 JavaScript / WebGL2 · 无构建 · 中文 / English
+[MIT](LICENSE) · 原生 JavaScript / WebGL2 · 浏览器版无构建步骤 · 中文 / English
 
 ## 先做一次双缝实验
 
-直接打开 `index.html`，页面会加载双缝场景。也可以用 Python 3 启动本地服务器：
+在浏览器中直接打开 `index.html`，页面会加载双缝场景。也可以用 Python 3 启动本地服务器：
 
 ```bash
 git clone https://github.com/LINYEANSHU/wave-simulator.git
@@ -97,10 +103,14 @@ Get-ChildItem js -Recurse -Filter *.js | ForEach-Object { node --check $_.FullNa
 
 语法检查不覆盖着色器编译、数值精度或设备性能；调整数值模型后应在浏览器中复查波传播和测量结果。
 
+### 构建 Windows 桌面版
+
+在 Windows x64 上安装 Node.js 24 后，从仓库根目录运行 `node desktop/build.cjs` 构建桌面版。输出位于 `desktop/dist/`。
+
 ## 贡献者
 
 - [LINYEANSHU](https://github.com/LINYEANSHU)
 
 ## 许可证
 
-[MIT](LICENSE) © 2026 LINYEANSHU。项目使用浏览器原生 API，无第三方运行时库。教学场景围绕经典波动光学实验设计。
+[MIT](LICENSE) © 2026 LINYEANSHU。浏览器版使用原生 API，无第三方运行时库。教学场景围绕经典波动光学实验设计。

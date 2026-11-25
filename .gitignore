@@ -15,3 +15,12 @@ desktop.ini
 # 依赖与日志(本项目无构建系统,防御性排除)
 node_modules/
 npm-debug.log*
+
+# 本地设计复查资料
+/REVIEW-2026-11-06.md
+
+# Windows 桌面打包产物与本地依赖
+/desktop/.cache/
+/desktop/dist/
+/desktop/qa/
+/desktop/node_modules/

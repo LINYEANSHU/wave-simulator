@@ -7,21 +7,27 @@
 **Draw sources and barriers, then watch propagation, interference and diffraction.**
 WaveLab advances a two-dimensional scalar wave equation with WebGL2 and measures waveforms and time-averaged intensity with a probe and observation screen.
 
-![Current desktop interface: the initial propagation phase of the double-slit experiment, with wavefronts approaching the slits and controls on the right](assets/readme/current-desktop.png)
+**[Download for Windows (x64)](https://github.com/LINYEANSHU/wave-simulator/releases/download/windows-v1.0.0/wave-simulator-windows-x64.zip)** · [Release notes](https://github.com/LINYEANSHU/wave-simulator/releases/tag/windows-v1.0.0)
+
+Extract the ZIP and double-click `WaveLab.exe` inside the app folder. Keep the entire folder together when moving the app.
+
+![Windows app showing the double-slit setup with a wave source, slits, a screen and a probe](assets/readme/windows-desktop.webp)
 
 <details>
-<summary>View the mobile interface</summary>
+<summary>View the desktop and mobile browser interfaces</summary>
+
+<img src="assets/readme/current-desktop.png" alt="Current desktop interface: the initial propagation phase of the double-slit experiment, with wavefronts approaching the slits and controls on the right">
 
 <img src="assets/readme/current-mobile.png" width="390" alt="Mobile interface with horizontally selectable scenes, a wave field and probe above the controls">
 
 </details>
 
 [![CI](https://github.com/LINYEANSHU/wave-simulator/actions/workflows/ci.yml/badge.svg)](https://github.com/LINYEANSHU/wave-simulator/actions/workflows/ci.yml)
-[MIT](LICENSE) · Vanilla JavaScript / WebGL2 · No build · English / 中文
+[MIT](LICENSE) · Vanilla JavaScript / WebGL2 · No browser build step · English / 中文
 
 ## Start with double-slit interference
 
-Open `index.html` directly to load the double-slit scene, or start a local server with Python 3:
+Open `index.html` in a browser to load the double-slit scene, or start a local server with Python 3:
 
 ```bash
 git clone https://github.com/LINYEANSHU/wave-simulator.git
@@ -97,10 +103,14 @@ Get-ChildItem js -Recurse -Filter *.js | ForEach-Object { node --check $_.FullNa
 
 Syntax checks do not cover shader compilation, numerical accuracy or device performance. Recheck wave propagation and measurements in the browser after changing the numerical model.
 
+### Build the Windows app
+
+To build the desktop app, run `node desktop/build.cjs` from the repository root on Windows x64 with Node.js 24. The build output is in `desktop/dist/`.
+
 ## Contributors
 
 - [LINYEANSHU](https://github.com/LINYEANSHU)
 
 ## License
 
-[MIT](LICENSE) © 2026 LINYEANSHU. The project uses native browser APIs with no third-party runtime libraries. Scenes are based on classic wave-optics teaching experiments.
+[MIT](LICENSE) © 2026 LINYEANSHU. The browser version uses native APIs with no third-party runtime libraries. Scenes are based on classic wave-optics teaching experiments.

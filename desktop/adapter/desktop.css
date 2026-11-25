@@ -1,0 +1,199 @@
+:root {
+  color-scheme: dark;
+}
+
+.topbar {
+  height: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 7px 14px 0;
+  gap: 5px 12px;
+}
+
+.logo-sub {
+  display: block;
+}
+
+.top-actions {
+  justify-self: end;
+  margin: 0;
+}
+
+.top-actions .btn {
+  min-height: 34px;
+}
+
+.scene-tabs {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  padding: 4px;
+  gap: 3px;
+  background: var(--ground);
+  border-radius: 5px 5px 0 0;
+}
+
+.scene-tab {
+  min-height: 28px;
+  padding: 4px 5px;
+  line-height: 1.18;
+  white-space: normal;
+}
+
+body,
+main {
+  overflow: hidden;
+}
+
+main {
+  flex-direction: row;
+}
+
+.desktop-wave-workspace {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.desktop-wave-tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 6px 12px;
+  background: var(--panel);
+}
+
+.desktop-wave-tools .toolbar {
+  position: static;
+  flex: none;
+  flex-direction: row;
+  padding: 3px;
+  background: var(--ground);
+}
+
+.desktop-wave-tools .tool-btn {
+  width: 34px;
+  height: 32px;
+}
+
+.desktop-wave-tools .hint {
+  position: static;
+  display: block;
+  transform: none;
+  padding: 0;
+  min-width: 0;
+  max-width: none;
+  background: transparent;
+  line-height: 1.4;
+}
+
+.stage {
+  min-height: 0;
+  padding: 0;
+}
+
+.canvas-box {
+  isolation: isolate;
+}
+
+.desktop-wave-status .chips {
+  position: static;
+  padding: 5px 10px;
+  gap: 4px;
+  background: var(--panel);
+  font-variant-numeric: tabular-nums;
+}
+
+.desktop-wave-status .chip {
+  padding: 4px 8px;
+  background: var(--ground);
+}
+
+.scope {
+  bottom: 10px;
+  max-width: calc(100% - 20px);
+}
+
+.panel {
+  width: clamp(278px, 24vw, 332px);
+  min-height: 0;
+  padding: 16px 15px 18px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--panel-3) var(--panel);
+  gap: 20px;
+}
+
+.sec {
+  gap: 8px;
+}
+
+.sec-title {
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.ctl {
+  grid-template-columns: minmax(64px, max-content) minmax(0, 1fr) 54px;
+}
+
+.src-card .ctl {
+  grid-template-columns: minmax(58px, max-content) minmax(0, 1fr) 50px;
+  gap: 8px;
+}
+
+.seg button,
+.ctl-row .btn {
+  min-height: 30px;
+}
+
+.ctl-row .seg,
+.ctl-row .btn {
+  min-width: 0;
+}
+
+.btn-row .btn {
+  min-height: 34px;
+  min-width: 0;
+  padding-inline: 7px;
+}
+
+.modal-card {
+  max-height: min(88vh, 720px);
+}
+
+@media (min-width: 1540px) {
+  .scene-tabs {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 735px) {
+  body, main {
+    overflow: auto;
+  }
+
+  main {
+    flex-direction: column;
+  }
+
+  .desktop-wave-workspace {
+    flex: none;
+    min-height: 370px;
+  }
+
+  .panel {
+    width: 100%;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 600px) {
+  .scene-tabs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
