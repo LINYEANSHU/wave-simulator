@@ -20,3 +20,6 @@ jobs:
         run: |
           find js -name '*.js' -type f -print0 | xargs -0 -n1 node --check
           echo "All JS files passed node --check"
+
+      - name: Run experiment tests
+        run: node --test tests/*.test.cjs
